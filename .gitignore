@@ -1,6 +1,0 @@
-virtual/
-*.pyc
-instance/
-.vscode/
-start.sh
-.gitiignore
