@@ -1,7 +1,34 @@
+# from . import db
+# from . import login_manager
+from flask_login import LoginManager
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_sqlalchemy import SQLAlchemy
+from flask import Flask
+from flask_login import UserMixin
+
+login_manager = LoginManager()
+login_manager.session_protection = 'strong'
+login_manager.login_view = 'auth.login'
+
+
+db = SQLAlchemy()
+
+app = Flask(__name__)
+db.init_app(app)
+login_manager.init_app(app)
+
+
+# getting user unique id
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+
 class Movie:
     '''
     Movie class to define Movie Objects
     '''
+
     def __init__(self, id, title, overview, poster, vote_average, vote_count):
         self.id = id
         self.title = title
@@ -37,3 +64,43 @@ class Reviews:
                 response.append(review)
 
         return response
+
+# create users table
+
+
+class User(UserMixin, db.Model):
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(255))
+    pass_secure = db.Column(db.String(255))
+    email = db.Column(db.String(), unique=True, index=True)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+
+    @property
+    def password(self):
+        raise AttributeError('You cannot read the password attribute')
+
+    @password.setter
+    def password(self, password):
+        self.pass_secure = generate_password_hash(password)
+
+    def verify_password(self, password):
+        return check_password_hash(self.pass_secure, password)
+
+    def __repr__(self):
+        return f'User {self.username}'
+
+
+# create roles table
+
+
+class Role(db.Model):
+    __tablename__ = 'roles'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255))
+    users = db.relationship('User', backref='role', lazy="dynamic")
+
+    def __repr__(self):
+        return f'User {self.name}'

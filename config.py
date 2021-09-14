@@ -9,6 +9,7 @@ class Config:
     MOVIE_API_KEY = os.environ.get('MOVIE_API_KEY')
     # SECRET_KEY = os.environ.get('SECRET_KEY')
     SECRET_KEY = os.urandom(32)
+    SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://developer:developerwilson@localhost/watchlist'
 
     @staticmethod
     def init_app(app):
