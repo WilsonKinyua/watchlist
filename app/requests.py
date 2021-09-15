@@ -15,10 +15,6 @@ def configure_request(app):
     base_url = app.config['MOVIE_API_BASE_URL']
 
 
-
-
-
-
 def get_movies(category):
     '''
     Function that gets the json responce to our url request
